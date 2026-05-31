@@ -3,18 +3,15 @@ import { ArrowLeft, Camera, Save, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { ImageCropperDialog } from "@/components/ImageCropperDialog";
-import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 
 const SettingsPage = () => {
   const navigate = useNavigate();
-  const { user, profile, signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { user, profile } = useAuth();
   const { toast } = useToast();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -227,28 +224,6 @@ const SettingsPage = () => {
             <Button onClick={handleChangePassword} disabled={changingPw} variant="outline" className="w-full rounded-xl">
               {changingPw ? "Updating…" : "Change Password"}
             </Button>
-          </div>
-
-          <div className="mt-6 border-t border-border pt-4">
-            <Button onClick={signOut} variant="ghost" className="w-full rounded-xl text-destructive hover:text-destructive">
-              Log Out
-            </Button>
-          </div>
-        </section>
-
-        {/* Appearance Settings */}
-        <section className="rounded-2xl bg-card p-5">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Appearance</h2>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">Light Mode</p>
-              <p className="text-xs text-muted-foreground">Switch to a lighter palette</p>
-            </div>
-            <Switch
-              checked={theme === "light"}
-              onCheckedChange={(checked) => setTheme(checked ? "light" : "dark")}
-            />
           </div>
         </section>
       </div>

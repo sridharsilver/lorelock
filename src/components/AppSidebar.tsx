@@ -1,4 +1,4 @@
-import { BookOpen, Settings, Heart, Clock, FolderOpen } from "lucide-react";
+import { BookOpen, Settings, Heart, Clock, FolderOpen, LogOut, Palette } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
@@ -15,10 +15,13 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
+import { useTheme } from "@/hooks/useTheme";
+import { Switch } from "@/components/ui/switch";
 
 export function AppSidebar() {
-  const { profile } = useAuth();
+  const { profile, signOut } = useAuth();
   const { favorites, recentProjects } = useProjects();
+  const { theme, setTheme } = useTheme();
   const displayName = profile?.display_name || profile?.username || "Writer";
 
   return (
@@ -128,9 +131,32 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
-        <div className="px-2 py-2 text-xs text-muted-foreground">
-          LoreLock v1
+      <SidebarFooter className="border-t border-sidebar-border">
+        <div className="space-y-1 px-2 py-2">
+          {/* Appearance */}
+          <div className="flex items-center justify-between px-2 py-1.5">
+            <div className="flex items-center gap-2">
+              <Palette className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-foreground">Light Mode</span>
+            </div>
+            <Switch
+              checked={theme === "light"}
+              onCheckedChange={(checked) => setTheme(checked ? "light" : "dark")}
+            />
+          </div>
+
+          {/* Log Out */}
+          <button
+            onClick={signOut}
+            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-destructive transition-colors hover:bg-destructive/10"
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Log Out</span>
+          </button>
+
+          <div className="px-2 pt-1 text-xs text-muted-foreground">
+            LoreLock v1
+          </div>
         </div>
       </SidebarFooter>
     </Sidebar>
