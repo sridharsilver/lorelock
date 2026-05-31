@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["pwa-icon.svg"],
+      includeAssets: ["appicon.png", "pwa-icon.svg"],
       manifest: {
         name: "LoreLock",
         short_name: "LoreLock",
@@ -30,15 +30,21 @@ export default defineConfig(({ mode }) => ({
         start_url: "/",
         icons: [
           {
-            src: "/pwa-icon.svg",
-            sizes: "512x512",
-            type: "image/svg+xml",
+            src: "/appicon-192.png",
+            sizes: "192x192",
+            type: "image/png",
             purpose: "any",
           },
           {
-            src: "/pwa-icon.svg",
+            src: "/appicon.png",
             sizes: "512x512",
-            type: "image/svg+xml",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "/appicon.png",
+            sizes: "512x512",
+            type: "image/png",
             purpose: "maskable",
           },
         ],
