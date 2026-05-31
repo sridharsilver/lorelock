@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["appicon.png", "pwa-icon.svg"],
+      includeAssets: ["appicon.png"],
       manifest: {
         name: "LoreLock",
         short_name: "LoreLock",
