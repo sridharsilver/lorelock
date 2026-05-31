@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 const SignUpPage = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +28,12 @@ const SignUpPage = () => {
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
 
     const trimmedUsername = username.trim().toLowerCase();
     if (trimmedUsername.length < 3) {
@@ -55,10 +62,9 @@ const SignUpPage = () => {
       return;
     }
 
-    // Sign up with email derived from username
-    const email = `${trimmedUsername}@lorelock.app`;
+    // Sign up with the provided email
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
+      email: trimmedEmail,
       password,
     });
 
@@ -88,6 +94,7 @@ const SignUpPage = () => {
     const { error: profileError } = await supabase.from("profiles").insert({
       user_id: userId,
       username: trimmedUsername,
+      email: trimmedEmail,
       display_name: displayName.trim() || null,
       avatar_url: avatarUrl,
     });
@@ -160,6 +167,18 @@ const SignUpPage = () => {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="How you'll appear in-app"
+              className="rounded-xl bg-card border-border"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-muted-foreground">Email</label>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              required
               className="rounded-xl bg-card border-border"
             />
           </div>

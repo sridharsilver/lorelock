@@ -20,6 +20,7 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
 
   const [displayName, setDisplayName] = useState(profile?.display_name || "");
   const [username, setUsername] = useState(profile?.username || "");
+  const [email, setEmail] = useState(profile?.email || "");
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || "");
   const [saving, setSaving] = useState(false);
 
@@ -33,6 +34,14 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
     if (!user) return;
     setSaving(true);
     try {
+      // Validate and normalize email
+      const trimmedEmail = email.trim().toLowerCase();
+      if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+        toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
+        setSaving(false);
+        return;
+      }
+
       // Check username uniqueness if changed
       if (username !== profile?.username) {
         const { data: available } = await supabase.rpc("check_username_available", { desired_username: username });
@@ -44,7 +53,7 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
       }
       const { error } = await supabase
         .from("profiles")
-        .update({ display_name: displayName || null, username, avatar_url: avatarUrl || null })
+        .update({ display_name: displayName || null, username, email: trimmedEmail, avatar_url: avatarUrl || null })
         .eq("user_id", user.id);
       if (error) throw error;
       toast({ title: "Profile updated" });
@@ -144,6 +153,16 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
                 placeholder="username"
+                className="mt-1 bg-secondary border-border"
+              />
+            </div>
+            <div>
+              <Label className="text-muted-foreground">Email</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
                 className="mt-1 bg-secondary border-border"
               />
             </div>

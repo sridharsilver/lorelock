@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,11 +16,16 @@ const LoginPage = () => {
     setError("");
     setLoading(true);
 
-    // Lookup email from username by trying login with username as email prefix
-    const email = `${username.toLowerCase().trim()}@lorelock.app`;
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    setLoading(true);
 
     const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
+      email: trimmedEmail,
       password,
     });
 
@@ -54,11 +59,12 @@ const LoginPage = () => {
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-muted-foreground">Username</label>
+            <label className="mb-1.5 block text-sm font-medium text-muted-foreground">Email</label>
             <Input
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Your username"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
               required
               className="rounded-xl bg-card border-border"
             />
