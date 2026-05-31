@@ -39,6 +39,7 @@ export interface Project {
   id: string;
   title: string;
   subtitle: string;
+  favorited: boolean;
   createdAt: string;
   updatedAt: string;
   characters: Character[];

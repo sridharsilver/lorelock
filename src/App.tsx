@@ -9,6 +9,8 @@ import Index from "./pages/Index.tsx";
 import EntryPage from "./pages/EntryPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import SignUpPage from "./pages/SignUpPage.tsx";
+import SettingsPage from "./pages/SettingsPage.tsx";
+import ProjectPage from "./pages/ProjectPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -49,6 +51,8 @@ const App = () => (
           <AuthProvider>
             <Routes>
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+              <Route path="/project/:id" element={<ProtectedRoute><ProjectPage /></ProtectedRoute>} />
               <Route path="/entry" element={<PublicRoute><EntryPage /></PublicRoute>} />
               <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
               <Route path="/signup" element={<PublicRoute><SignUpPage /></PublicRoute>} />

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ArrowLeft, Camera, Save, Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { ImageCropperDialog } from "@/components/ImageCropperDialog";
 import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,15 +11,15 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 
-interface SettingsPageProps {
-  onBack: () => void;
-}
-
-const SettingsPage = ({ onBack }: SettingsPageProps) => {
+const SettingsPage = () => {
+  const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cropperFile, setCropperFile] = useState<File | null>(null);
+  const [cropperOpen, setCropperOpen] = useState(false);
   const [displayName, setDisplayName] = useState(profile?.display_name || "");
   const [username, setUsername] = useState(profile?.username || "");
   const [email, setEmail] = useState(profile?.email || "");
@@ -63,12 +65,19 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
     setSaving(false);
   }
 
-  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleAvatarSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file || !user) return;
-    const ext = file.name.split(".").pop();
-    const path = `${user.id}/avatar.${ext}`;
-    const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    if (file) {
+      setCropperFile(file);
+      setCropperOpen(true);
+    }
+  }
+
+  async function handleCropComplete(croppedBlob: Blob) {
+    if (!user) return;
+    const path = `${user.id}/avatar.jpg`;
+    const croppedFile = new File([croppedBlob], "avatar.jpg", { type: "image/jpeg" });
+    const { error } = await supabase.storage.from("avatars").upload(path, croppedFile, { upsert: true });
     if (error) {
       toast({ title: "Upload failed", variant: "destructive" });
       return;
@@ -105,7 +114,7 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
         {/* Header */}
         <div className="mb-8 flex items-center gap-3">
           <button
-            onClick={onBack}
+            onClick={() => navigate("/")}
             className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -131,11 +140,18 @@ const SettingsPage = ({ onBack }: SettingsPageProps) => {
               )}
               <label className="absolute -bottom-1 -right-1 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-110">
                 <Camera className="h-3.5 w-3.5" />
-                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarSelect} />
               </label>
             </div>
             <div className="text-sm text-muted-foreground">Tap to change avatar</div>
           </div>
+
+          <ImageCropperDialog
+            open={cropperOpen}
+            onClose={() => setCropperOpen(false)}
+            file={cropperFile}
+            onCropComplete={handleCropComplete}
+          />
 
           <div className="space-y-4">
             <div>

@@ -25,6 +25,7 @@ export function createEmptyProject(title: string, subtitle: string): Project {
     id: generateId(),
     title,
     subtitle,
+    favorited: false,
     createdAt: now,
     updatedAt: now,
     characters: [],

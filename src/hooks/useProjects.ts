@@ -32,5 +32,17 @@ export function useProjects() {
     save(projects.filter((p) => p.id !== id));
   }, [projects, save]);
 
-  return { projects, addProject, updateProject, deleteProject };
+  const toggleFavorite = useCallback((id: string) => {
+    const updated = projects.map((p) =>
+      p.id === id ? { ...p, favorited: !p.favorited, updatedAt: new Date().toISOString() } : p
+    );
+    save(updated);
+  }, [projects, save]);
+
+  const favorites = projects.filter((p) => p.favorited);
+  const recentProjects = [...projects]
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    .slice(0, 5);
+
+  return { projects, favorites, recentProjects, addProject, updateProject, deleteProject, toggleFavorite };
 }

@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, ArrowLeft, Camera } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { ImageCropperDialog } from "@/components/ImageCropperDialog";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -14,15 +15,23 @@ const SignUpPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [cropperFile, setCropperFile] = useState<File | null>(null);
+  const [cropperOpen, setCropperOpen] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
-      setAvatarFile(file);
-      setAvatarPreview(URL.createObjectURL(file));
+      setCropperFile(file);
+      setCropperOpen(true);
     }
+  }
+
+  function handleCropComplete(croppedBlob: Blob) {
+    const croppedFile = new File([croppedBlob], "avatar.jpg", { type: "image/jpeg" });
+    setAvatarFile(croppedFile);
+    setAvatarPreview(URL.createObjectURL(croppedBlob));
   }
 
   async function handleSignUp(e: React.FormEvent) {
@@ -149,6 +158,13 @@ const SignUpPage = () => {
               className="hidden"
             />
           </div>
+
+          <ImageCropperDialog
+            open={cropperOpen}
+            onClose={() => setCropperOpen(false)}
+            file={cropperFile}
+            onCropComplete={handleCropComplete}
+          />
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-muted-foreground">Username</label>

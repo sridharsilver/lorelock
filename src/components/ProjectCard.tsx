@@ -1,15 +1,16 @@
 import { Project } from "@/lib/types";
-import { Trash2, ChevronRight } from "lucide-react";
+import { Trash2, ChevronRight, Heart } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface ProjectCardProps {
   project: Project;
   onClick: () => void;
   onDelete: () => void;
+  onToggleFavorite?: () => void;
   style?: React.CSSProperties;
 }
 
-const ProjectCard = ({ project, onClick, onDelete, style }: ProjectCardProps) => {
+const ProjectCard = ({ project, onClick, onDelete, onToggleFavorite, style }: ProjectCardProps) => {
   return (
     <div
       className="group relative flex cursor-pointer items-center gap-4 rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/30 hover:bg-secondary animate-fade-in"
@@ -25,6 +26,21 @@ const ProjectCard = ({ project, onClick, onDelete, style }: ProjectCardProps) =>
           Edited {formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true })}
         </p>
       </div>
+
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleFavorite?.();
+        }}
+        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all ${
+          project.favorited
+            ? "text-red-500 hover:text-red-600"
+            : "text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-red-400"
+        }`}
+        title={project.favorited ? "Remove from favorites" : "Add to favorites"}
+      >
+        <Heart className={`h-4 w-4 ${project.favorited ? "fill-current" : ""}`} />
+      </button>
 
       <button
         onClick={(e) => {
